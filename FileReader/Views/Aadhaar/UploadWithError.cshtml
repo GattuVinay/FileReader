@@ -1,0 +1,17 @@
+﻿@model FileReader.Models.AdharModel
+
+@section Scripts {
+    <script type="text/javascript">
+        Swal.fire({
+            icon: 'warning',
+            title: 'Invalid File Format',
+            text: '@ViewBag.ErrorMessage',
+            showConfirmButton: true,
+            confirmButtonText: 'Retry'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '@Url.Action("Upload", "Aadhaar")';
+            }
+        });
+    </script>
+}

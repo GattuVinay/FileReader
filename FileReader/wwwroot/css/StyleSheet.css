@@ -1,0 +1,6 @@
+﻿button, input, optgroup, select, textarea {
+    margin: 0;
+    font-family: inherit;
+    font-size: x-small;
+    line-height: 2;
+}
