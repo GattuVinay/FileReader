@@ -97,11 +97,11 @@ namespace FileReader.Controllers
                     {
                         using (var memoryStream = new MemoryStream())
                         {
-                            page.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png); 
+                            page.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
                             var img = Pix.LoadFromMemory(memoryStream.ToArray());
 
                             // Perform OCR on the image
-                            extractedText += ExtractTextFromImage(img); 
+                            extractedText += ExtractTextFromImage(img);
                         }
                     }
                 }
@@ -151,23 +151,22 @@ namespace FileReader.Controllers
         // Parse Aadhaar details from the extracted text
         private AdharModel ParseAadhaarDetails(string extractedText)
         {
+
             var adhar = new AdharModel();
+
             try
             {
-                // Split the extracted text into lines
+
                 var lines = extractedText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
-                // Iterate through each line and extract relevant details
                 for (int i = 0; i < lines.Length; i++)
                 {
                     var trimmedLine = lines[i].Trim();
 
-                    // Extract DOB (Look for "DOB", "008 :", "Year of Birth", or its regional variants)
-                    if (trimmedLine.Contains("DOB") || trimmedLine.Contains("008 :")|| trimmedLine.Contains("Year of Birth") || trimmedLine.Contains("0౦8"))
+                    if (trimmedLine.Contains("DOB") || trimmedLine.Contains("008 :") || trimmedLine.Contains("Year of Birth") || trimmedLine.Contains("0౦8"))
                     {
                         adhar.DOB = ExtractDOB(trimmedLine);
 
-                        // Extract name from the line before DOB
                         if (i > 0)
                         {
                             adhar.FirstName = lines[i - 1].Trim();
@@ -177,7 +176,6 @@ namespace FileReader.Controllers
                             adhar.FirstName = "Name Not Found";
                         }
 
-                        // Handle gender based on extracted information
                         if (adhar.Gender == "Female")
                         {
                             adhar.FirstName = lines[i - 4].Trim();
@@ -202,14 +200,29 @@ namespace FileReader.Controllers
                     {
                         adhar.Adharnumber = GetAadhaarNumber(trimmedLine);
                     }
+                    else if (trimmedLine.Contains("UNIVERSITY ") || trimmedLine.Contains("University"))
+                    {
+                        adhar.University = ExtractUniversity(lines);
+                    }
+                    else if (trimmedLine.Contains("B,") || trimmedLine.Contains("B."))
+                    {
+                        adhar.Qualification = ExtractQualification(lines);
+                    }
+                    if (trimmedLine.Contains("held in"))
+                    {
+                        adhar.YearOfPassOut = ExtractYearOfPassOut(lines);
+                    }
 
-                    // Extract Address from text after finding "Address"
                     if (trimmedLine.Contains("Address"))
                     {
+
                         adhar.Address = ExtractAddress(lines.Skip(i).ToArray());
                     }
                 }
+
+
             }
+
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
@@ -227,8 +240,8 @@ namespace FileReader.Controllers
 
         // Utility function to extract gender from a line
         private string ExtractGender(string line)
-            {
-                if (line.Contains("Male"))
+        {
+            if (line.Contains("Male"))
             {
                 return "Male";
             }
@@ -246,6 +259,83 @@ namespace FileReader.Controllers
             var match = Regex.Match(line, @"(S/O|D/O|Father)\s+(.+?),");
             return match.Success ? match.Groups[2].Value : string.Empty;
         }
+        //Extract University
+        private string ExtractUniversity(string[] lines)
+        {
+            StringBuilder addressBuilder = new StringBuilder();
+
+            foreach (var line in lines)
+            {
+                var trimmedLine = line.Trim();
+
+                if (trimmedLine.Contains("University") || trimmedLine.Contains("UNIVERSITY"))
+                {
+                    addressBuilder.Append(trimmedLine);
+                    break;
+                }
+            }
+
+            return addressBuilder.ToString().Trim();
+        }
+
+        //Extract Qualification
+        private string ExtractQualification(string[] lines)
+        {
+            StringBuilder addressBuilder = new StringBuilder();
+
+            foreach (var line in lines)
+            {
+                var trimmedLine = line.Trim();
+
+                if (trimmedLine.Contains("B,") || trimmedLine.Contains("B."))
+                {
+                    var parts = trimmedLine.Split(',');
+
+                    if (parts.Length >= 2)
+                    {
+                        addressBuilder.Append(parts[0].Trim()).Append(".").Append(parts[1].Trim());
+                    }
+                    else
+                    {
+                        addressBuilder.Append(trimmedLine);
+                    }
+
+                    break;
+                }
+            }
+
+            return addressBuilder.ToString().Trim();
+        }
+        private string ExtractYearOfPassOut(string[] lines)
+        {
+            foreach (var line in lines)
+            {
+                var trimmedLine = line.Trim();
+
+                if (trimmedLine.Contains("held in"))
+                {
+                    int startIndex = trimmedLine.IndexOf("held in") + "held in".Length;
+                    string relevantPart = trimmedLine.Substring(startIndex).Trim();
+
+                    var match = Regex.Match(relevantPart, @"\b\d{4}\b");
+
+                    if (match.Success)
+                    {
+                        return match.Value;
+                    }
+
+                    break;
+                }
+            }
+
+            return string.Empty;
+        }
+
+
+
+
+
+
 
         //  function to extract address by concatenating lines until a 6-digit postal code is found
         private string ExtractAddress(string[] lines)
@@ -271,7 +361,7 @@ namespace FileReader.Controllers
                         var parts = trimmedLine.Split(new[] { ',' }, 2);
                         if (parts.Length > 1)
                         {
-                           
+
                             addressBuilder.Append(parts[1].Trim()).Append(" ");
                         }
                     }
@@ -286,7 +376,7 @@ namespace FileReader.Controllers
                 }
             }
 
-            return addressBuilder.ToString().Trim(); 
+            return addressBuilder.ToString().Trim();
 
         }
 

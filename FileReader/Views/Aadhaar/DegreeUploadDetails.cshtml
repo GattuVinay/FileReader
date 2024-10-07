@@ -1,0 +1,46 @@
+﻿@model FileReader.Models.DegreeUploadDetails
+
+@{
+    ViewBag.Title = "Person Details";
+}
+
+<h2>Edit Aadhaar Details</h2>
+
+@using (Html.BeginForm("UpdateAadhaar", "Aadhaar", FormMethod.Post))
+{
+
+    <div>
+        @Html.LabelFor(m => m.FirstName, "Name :")
+        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+    </div>
+    <div>
+        @Html.LabelFor(m => m.SurName, "Family Name ")"
+        @Html.TextBoxFor(m => m.SurName, new { @class = "form-control" })
+    </div>
+    <div>
+        @Html.LabelFor(m => m.FatherName, "Father Name :")
+        @Html.TextBoxFor(m => m.FatherName, new { @class = "form-control" })
+    </div>
+    <div>
+        @Html.LabelFor(m => m.Qualification, "Qualification :")
+        @Html.TextAreaFor(m => m.Qualification, new { @class = "form-control" })
+    </div>
+    <div>
+        @Html.LabelFor(m => m.YearOfPassOut, "Date of Passout :")
+        @Html.TextBoxFor(m => @Model.YearOfPassOut, new { @class = "form-control" })
+    </div>
+
+    <div>
+        @Html.LabelFor(m => m.Gender, "Gender :")
+        @Html.TextBoxFor(m => m.Gender, new { @class = "form-control" })
+    </div>
+    <div>
+        @Html.LabelFor(m => m.University, "University :")
+        @Html.TextBoxFor(m => m.University, new { @class = "form-control" })
+    </div>
+    
+    <span>  </span>
+    <div>
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+}

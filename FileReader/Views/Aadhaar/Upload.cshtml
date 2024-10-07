@@ -1,44 +1,55 @@
-﻿@{
+﻿@model FileReader.Models.AdharModel
+@{
     ViewBag.Title = "Upload Aadhaar";
 }
 
-<div class="align-bottom">
-<h2>Upload Aadhaar Card</h2>
-
-<!-- Selection for Single or Multiple Image Upload -->
 <div>
-    <label>
-        <input type="checkbox" id="singleImage" name="imageType" value="single" />
-        One Side (or)  Full File
-    </label> <span>  </span>
-    <label>
-        <input type="checkbox" id="twoImages" name="imageType" value="two" />
-        Other Side
-    </label>
-</div>
+    <h2>Upload Aadhaar Card</h2>
+
+
+    <!-- Selection for Single or Multiple Image Upload -->
+    <div>
+        <label>
+            <input type="checkbox" id="singleImage" name="imageType" value="single" />
+            Adhar Front View
+        </label> <span>  </span>
+        <label>
+            <input type="checkbox" id="twoImages" name="imageType" value="two" />
+            Adhar Back View
+        </label>
+
+    </div>
 
 </div>
 <!-- Form for File Upload -->
 @using (Html.BeginForm("Upload", "Aadhaar", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <div class="align-content-center">
-    <div id="fileInputContainer">
-        <!-- Single Image Input -->
-        <div id="singleFileInput">
-            <input class="btn-warning" type="file" name="file" /><span></span>
-        </div>
+    <div class="col-md-12">
+        <div id="fileInputContainer">
+            <!-- Single Image Input -->
+            <div id="singleFileInput">
+                <label>Adhar Front Side</label>
+                <input class="btn-warning" type="file" name="file" /><span></span>
+            </div>
 
-        <!-- Multiple Image Inputs (hidden by default) -->
-        <div id="twoFileInputs" style="display:none;">
-            <input class="btn-warning" type="file" name="file1" /><span></span>
-            <input class="btn-warning" type="file" name="file2" /><span></span>
+            <!-- Multiple Image Inputs (hidden by default) -->
+            <div id="twoFileInputs" style="display:none;">
+                <lable>Adhar Back Side</lable>
+                <input class="btn-warning" type="file" name="file1" /><span></span>
+                <input class="btn-warning" type="file" name="file2" /><span></span>
+            </div>
+            @* Degree Certificate  *@
+            <div id="DegreeCert">
+                <lable>Degree Certificate </lable>
+                <input class="btn-warning" type="file" name="file" /><span></span>
+            </div>
         </div>
-    </div>
-    <div>
-        <input class="btn-success" type="submit" value="Upload" />
-    </div>
+        <div>
+            <input class="btn-success" type="submit" value="Upload" />
+        </div>
     </div>
 }
+
 
 <link href="~/css/stylesheet.css" rel="stylesheet" />
 <script src="~/js/javascript.js"></script>
