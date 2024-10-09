@@ -8,49 +8,48 @@
 
 @using (Html.BeginForm("UpdateAadhaar", "Aadhaar", FormMethod.Post))
 {
-
     <div>
-        @Html.LabelFor(m => m.FirstName, "Name:")
-        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
-    </div>
-    <div>
-        @Html.LabelFor(m => m.Father, "Father Name:")
-        @Html.TextBoxFor(m => m.Father, new { @class = "form-control" })
         <div>
+            @Html.LabelFor(m => m.FirstName, "Name:")
+            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
         </div>
-        @Html.LabelFor(m => m.DOB, "Date of Birth:")
-        @Html.TextBoxFor(m => @Model.DOB, new { @class = "form-control" })
-    </div>
+        <div>
+            @Html.LabelFor(m => m.Father, "Father Name:")
+            @Html.TextBoxFor(m => m.Father, new { @class = "form-control" })
+            <div>
+            </div>
+            @Html.LabelFor(m => m.DOB, "Date of Birth:")
+            @Html.TextBoxFor(m => @Model.DOB, new { @class = "form-control" })
+        </div>
 
-    <div>
-        @Html.LabelFor(m => m.Gender, "Gender:")
-        @Html.TextBoxFor(m => m.Gender, new { @class = "form-control" })
-    </div>
+        <div>
+            @Html.LabelFor(m => m.Gender, "Gender:")
+            @Html.TextBoxFor(m => m.Gender, new { @class = "form-control" })
+        </div>
 
-    <div>
-        @Html.LabelFor(m => m.Adharnumber, "Aadhaar Number:")
-        @Html.TextBoxFor(m => m.Adharnumber, new { @class = "form-control" })
-    </div>
+        <div>
+            @Html.LabelFor(m => m.Adharnumber, "Aadhaar Number:")
+            @Html.TextBoxFor(m => m.Adharnumber, new { @class = "form-control" })
+        </div>
 
-    <div>
-        @Html.LabelFor(m => m.Address, "Address:")
-        @Html.TextAreaFor(m => m.Address, new { @class = "form-control" })
-    </div>
+        <div>
+            @Html.LabelFor(m => m.Address, "Address:")
+            @Html.TextAreaFor(m => m.Address, new { @class = "form-control" })
+        </div>
 
-    <div>
-        @Html.LabelFor(m => m.Qualification, "Qualification :")
-        @Html.TextBoxFor(m => m.Qualification, new { @class = "form-control" })
+        <div>
+            @Html.LabelFor(m => m.Qualification, "Qualification :")
+            @Html.TextBoxFor(m => m.Qualification, new { @class = "form-control" })
+        </div>
+        <div>
+            @Html.LabelFor(m => m.YearOfPassOut, "Date of Passout :")
+            @Html.TextBoxFor(m => @Model.YearOfPassOut, new { @class = "form-control" })
+        </div>
+        <div>
+            @Html.LabelFor(m => m.University, "University :")
+            @Html.TextBoxFor(m => m.University, new { @class = "form-control" })
+        </div>
     </div>
-    <div>
-        @Html.LabelFor(m => m.YearOfPassOut, "Date of Passout :")
-        @Html.TextBoxFor(m => @Model.YearOfPassOut, new { @class = "form-control" })
-    </div>
-    <div>
-        @Html.LabelFor(m => m.University, "University :")
-        @Html.TextBoxFor(m => m.University, new { @class = "form-control" })
-    </div>
-
-    <span>  </span>
 
 
 

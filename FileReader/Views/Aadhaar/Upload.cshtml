@@ -8,37 +8,39 @@
 
 
     <!-- Selection for Single or Multiple Image Upload -->
-    <div>
+   @*  <div>
         <label>
             <input type="checkbox" id="singleImage" name="imageType" value="single" />
-            Adhar Front View
+            Single File
         </label> <span>  </span>
         <label>
             <input type="checkbox" id="twoImages" name="imageType" value="two" />
-            Adhar Back View
+            Multiple Files
         </label>
 
-    </div>
+    </div> *@
 
 </div>
 <!-- Form for File Upload -->
 @using (Html.BeginForm("Upload", "Aadhaar", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <div class="col-md-12">
+    <div class="col-md-8">
         <div id="fileInputContainer">
             <!-- Single Image Input -->
-            <div id="singleFileInput">
+            @* <div id="singleFileInput">
                 <label>Adhar Front Side</label>
                 <input class="btn-warning" type="file" name="file" /><span></span>
-            </div>
+            </div> *@
+            
 
             <!-- Multiple Image Inputs (hidden by default) -->
-            <div id="twoFileInputs" style="display:none;">
+            <div id="twoFileInputs" >
                 <lable>Adhar Back Side</lable>
                 <input class="btn-warning" type="file" name="file1" /><span></span>
                 <input class="btn-warning" type="file" name="file2" /><span></span>
             </div>
-            @* Degree Certificate  *@
+
+            <!-- Degree Certificate-->
             <div id="DegreeCert">
                 <lable>Degree Certificate </lable>
                 <input class="btn-warning" type="file" name="file" /><span></span>

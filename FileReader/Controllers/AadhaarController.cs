@@ -8,6 +8,9 @@ using PdfiumViewer;
 using SkiaSharp;
 using System.Text.RegularExpressions;
 using System.Text;
+using iText.IO.Image;
+using Emgu.CV.CvEnum;
+using Emgu.CV;
 
 namespace FileReader.Controllers
 {
@@ -82,8 +85,6 @@ namespace FileReader.Controllers
             }
         }
 
-
-
         // Extract text from PDF using PdfiumRenderer and apply OCR on each page
         private string ExtractTextFromPdf(string pdfPath)
         {
@@ -117,13 +118,16 @@ namespace FileReader.Controllers
             {
                 return ExtractTextFromImage(img);
             }
+
         }
 
         // Common method to extract text from Pix object (used for both images and PDF pages)
         private string ExtractTextFromImage(Pix img)
         {
+
             string extractedText = string.Empty;
             var tessDataPath = Path.Combine(Directory.GetCurrentDirectory(), "TessData");
+
 
             // Preprocess image (optional)
             var processedImg = PreprocessImage(img);
@@ -144,7 +148,6 @@ namespace FileReader.Controllers
         private Pix PreprocessImage(Pix img)
         {
             var grayImage = img.ConvertRGBToGray();
-            // Additional preprocessing steps like contrast adjustment or sharpening can be added here
             return grayImage;
         }
 
@@ -162,7 +165,10 @@ namespace FileReader.Controllers
                 for (int i = 0; i < lines.Length; i++)
                 {
                     var trimmedLine = lines[i].Trim();
-
+                    if (trimmedLine.Contains("UNIVERSITY") || trimmedLine.Contains("University") || trimmedLine.Contains("INSTITUTE"))
+                    {
+                        adhar.University = ExtractUniversity(lines);
+                    }
                     if (trimmedLine.Contains("DOB") || trimmedLine.Contains("008 :") || trimmedLine.Contains("Year of Birth") || trimmedLine.Contains("0౦8"))
                     {
                         adhar.DOB = ExtractDOB(trimmedLine);
@@ -176,17 +182,17 @@ namespace FileReader.Controllers
                             adhar.FirstName = "Name Not Found";
                         }
 
-                        if (adhar.Gender == "Female")
+                        if (adhar.FirstName.Contains("Father -"))
                         {
                             adhar.FirstName = lines[i - 4].Trim();
                         }
-                        else
-                        {
-                            adhar.FirstName = lines[i - 1].Trim();
-                        }
+                        //else
+                        //{
+                        //    adhar.FirstName = lines[i - 4].Trim();
+                        //}
                     }
 
-                    else if (trimmedLine.Contains("Male") || trimmedLine.Contains("Female"))
+                    else if (trimmedLine.Contains("Male") || trimmedLine.Contains("Female") || trimmedLine.Contains("go9"))
                     {
                         adhar.Gender = ExtractGender(trimmedLine);
                     }
@@ -200,22 +206,17 @@ namespace FileReader.Controllers
                     {
                         adhar.Adharnumber = GetAadhaarNumber(trimmedLine);
                     }
-                    else if (trimmedLine.Contains("UNIVERSITY ") || trimmedLine.Contains("University"))
-                    {
-                        adhar.University = ExtractUniversity(lines);
-                    }
-                    else if (trimmedLine.Contains("B,") || trimmedLine.Contains("B."))
+                    else if (trimmedLine.Contains("B,") || trimmedLine.Contains("B.") || trimmedLine.Contains("DEGREE OF") || trimmedLine.Contains("Bachelor") || trimmedLine.Contains("BACHELOR"))
                     {
                         adhar.Qualification = ExtractQualification(lines);
                     }
-                    if (trimmedLine.Contains("held in"))
+                    if (trimmedLine.Contains("held"))
                     {
                         adhar.YearOfPassOut = ExtractYearOfPassOut(lines);
                     }
 
                     if (trimmedLine.Contains("Address"))
                     {
-
                         adhar.Address = ExtractAddress(lines.Skip(i).ToArray());
                     }
                 }
@@ -234,14 +235,22 @@ namespace FileReader.Controllers
         // Utility function to extract DOB from a line
         private string ExtractDOB(string line)
         {
-            var match = Regex.Match(line, @"\d{2}/\d{2}/\d{4}");
-            return match.Success ? match.Value : string.Empty;
+            if (line.Contains("Year of Birth"))
+            {
+                var match = Regex.Match(line, @"Birth;\s*(\d{4})");
+                return match.Success ? match.Groups[1].Value : string.Empty;
+            }
+            else
+            {
+                var match = Regex.Match(line, @"\d{2}/\d{2}/\d{4}");
+                return match.Success ? match.Value : string.Empty;
+            }
         }
 
         // Utility function to extract gender from a line
         private string ExtractGender(string line)
         {
-            if (line.Contains("Male"))
+            if (line.Contains("Male") || line.Contains("go9"))
             {
                 return "Male";
             }
@@ -256,8 +265,17 @@ namespace FileReader.Controllers
         //  function to extract Father's name
         private string ExtractFather(string line)
         {
-            var match = Regex.Match(line, @"(S/O|D/O|Father)\s+(.+?),");
-            return match.Success ? match.Groups[2].Value : string.Empty;
+            if (line.Contains("Father -"))
+            {
+                var match = Regex.Match(line, @"Father\s*-\s*(.+)");
+                return match.Success ? match.Groups[1].Value.Trim() : string.Empty;
+            }
+            else
+            {
+                var match = Regex.Match(line, @"Address:\s*(?:S/O|D/O)?\s*(.*?)(?:,|$)");
+                return match.Success ? match.Groups[1].Value.Trim() : string.Empty;
+            }
+
         }
         //Extract University
         private string ExtractUniversity(string[] lines)
@@ -268,7 +286,7 @@ namespace FileReader.Controllers
             {
                 var trimmedLine = line.Trim();
 
-                if (trimmedLine.Contains("University") || trimmedLine.Contains("UNIVERSITY"))
+                if (trimmedLine.Contains("University") || trimmedLine.Contains("UNIVERSITY") || trimmedLine.Contains("INSTITUTE"))
                 {
                     addressBuilder.Append(trimmedLine);
                     break;
@@ -287,13 +305,13 @@ namespace FileReader.Controllers
             {
                 var trimmedLine = line.Trim();
 
-                if (trimmedLine.Contains("B,") || trimmedLine.Contains("B."))
+                if (trimmedLine.Contains("B,") || trimmedLine.Contains("B.") || trimmedLine.Contains("DEGREE OF") || trimmedLine.Contains("Bachelor"))
                 {
                     var parts = trimmedLine.Split(',');
 
                     if (parts.Length >= 2)
                     {
-                        addressBuilder.Append(parts[0].Trim()).Append(".").Append(parts[1].Trim());
+                        addressBuilder.Append(parts[0].Trim()).Append(",").Append(parts[1].Trim());
                     }
                     else
                     {
@@ -303,18 +321,19 @@ namespace FileReader.Controllers
                     break;
                 }
             }
-
-            return addressBuilder.ToString().Trim();
+                        return addressBuilder.ToString().Trim();
         }
+
+        //Extract ExtractYearOfPassOut
         private string ExtractYearOfPassOut(string[] lines)
         {
             foreach (var line in lines)
             {
                 var trimmedLine = line.Trim();
 
-                if (trimmedLine.Contains("held in"))
+                if (trimmedLine.Contains("held"))
                 {
-                    int startIndex = trimmedLine.IndexOf("held in") + "held in".Length;
+                    int startIndex = trimmedLine.IndexOf("held") + "held".Length;
                     string relevantPart = trimmedLine.Substring(startIndex).Trim();
 
                     var match = Regex.Match(relevantPart, @"\b\d{4}\b");
@@ -330,10 +349,6 @@ namespace FileReader.Controllers
 
             return string.Empty;
         }
-
-
-
-
 
 
 
